@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ch">
+<head>
+	<meta charset="UTF-8">
+	<title>Working Calendar</title>
+	<link href="https://cdn.bootcss.com/bootstrap/4.1.0/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.bootcss.com/vue/2.5.15/vue.min.js"></script>
+	<link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+
+	<div id="app">
+		<a href="/add"><h2 style="text-align: center; color: white;	text-shadow: 4px 3px 4px #000000cf;">2018年8月工作量</h2></a>
+		<div class="table-header">
+			<table class="table">
+				<tr class="thead">
+					<td class="col-1">日期</td>
+					<td class="col-2">上午</td>
+					<td class="col-3">下午</td>
+					<td class="col-4">晚上</td>
+					<td class="col-5">工作量(h)</td>
+					<td class="col-6">工作量(d)</td>
+					<td class="col-7">预估单价</td>
+					<td class="col-8">总价</td>
+				</tr>
+			</table>
+		</div>
+		<div class="table-content">
+			<table class="table">
+				<template v-for="item in workingList">
+					<tr class="work-info">
+						<td class="col-1">{{ item.date }} {{ item.day}}</td>
+						<td class="col-2 morning">{{ item.morning || "-"}}</td>
+						<td class="col-3 afternoon">{{ item.afternoon || "-" }}</td>
+						<td class="col-4 evening">{{ item.evening || "-"  }}</td>
+						<td class="col-5">{{ item.hworktime }}</td>
+						<td class="col-6">{{ item.hworktime / 8 }}</td>
+						<td class="col-7"><span class="fa fa-cny"></span>{{ item.price }}</td>
+						<td class="col-8"><span class="fa fa-cny"></span>{{ item.hworktime / 8 * item.price }}</td>
+					</tr>
+					<tr class="summary">
+						<td><span class="fa fa-edit"></span>总结</td>
+						<td class="summary-td" colspan="7">{{ item.summary }}</td>
+					</tr>
+				</template>
+			</table>
+		</div>
+		<div class="table-footer">
+			<table class="table">
+				<tr>
+					<td><span>工作量汇总</span></td>
+					<td><span>{{ workingList.length }}d</span></td>
+					<td><span>{{ workHours }}h</span></td>
+					<td><span>{{ workHours / 8 }}d</span></td>
+					<td><span><span class="fa fa-cny"></span>{{ sum }}</span></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	var app = new Vue({
+		el: '#app',
+		data: {
+			workingList: [{date:''}]
+		},
+		created: function(){
+			var that = this;
+			fetch('/workingList')
+			.then(res => res.json())
+			.then(data => (that.workingList = data))
+		},
+		computed: {
+			workHours: function(){
+				var sum = 0;
+				var arr = this.workingList;
+				for(var i = 0; i < arr.length; ++i){
+					sum += arr[i].hworktime;
+				}
+				return sum;
+			},
+			sum: function(){
+				var sum = 0;
+				var arr = this.workingList;
+				for(var i = 0; i < arr.length; ++i){
+					sum += arr[i].hworktime / 8 * arr[i].price;
+				}
+				return sum;
+			}
+		}
+	})
+</script>
+</html>
