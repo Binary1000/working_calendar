@@ -9,7 +9,7 @@ const arr = ['星期日', '星期一','星期二','星期三','星期四','星�
 var db = mysql.createConnection({
 	host: 'localhost',
 	user: 'root',
-	port: 3307,
+	port: 3306,
 	password: '123456',
 	database: 'work'
 });
@@ -18,14 +18,32 @@ const html_dir = __dirname + "/views/";
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.all('*', function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Content-Type,Content-Length, Authorization, Accept,X-Requested-With");
+    res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+    res.header("X-Powered-By",' 3.2.1')
+    if(req.method=="OPTIONS") res.send(200);/*让options请求快速返回*/
+    else  next();
+});
+
 app.get("/workingList", function (req, res) {
 	db.query("SELECT * from working_calendar", function (err, rows) {
 		res.send(rows);
 	});
 });
 
+app.get("/work", function (req, res) {
+	let date =  req.query.date;
+		console.log(date)
+
+	db.query("SELECT * from working_calendar where date = ?", [date], function (err, rows) {
+		res.send(rows[0]);
+	});
+});
+
 app.get("/add", function (req, res) {
-	res.sendFile(html_dir + "add.html" );
+	res.sendFile(html_dir + "add.html");
 });
 
 app.post("/work", function (req, res) {
@@ -49,7 +67,6 @@ app.delete("/work", function (req, res){
 	});
 });
 
-
 function getToday(){
 	const date = new Date();
 	const today = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
@@ -63,8 +80,8 @@ function getDay(){
 }
 
 var server = app.listen(8000, function () {
-  var host = server.address().address;
-  var port = server.address().port;
+var host = server.address().address;
+var port = server.address().port;
 
   console.log('my app listening at http://%s:%s', host, port);
 });
