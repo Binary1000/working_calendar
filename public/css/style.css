@@ -110,3 +110,15 @@ td{
 tr.work-info{
 	box-shadow: 5px 3px 5px #e8e5d538;
 }
+
+.display_mode{
+	position: absolute;
+	right: 28px;
+	top: 19px;
+	color: white;
+	font-size: 18px;
+}
+
+.grid, .list{
+	cursor: pointer;
+}
